@@ -1,0 +1,22 @@
+{
+  // Evita que las extensiones de Java/Gradle levanten JVMs al abrir el proyecto Flutter
+  "java.import.gradle.enabled": false,
+  "java.import.maven.enabled": false,
+  "java.autobuild.enabled": false,
+  "java.server.launchMode": "LightWeight",
+  "java.import.exclusions": ["**/android/**"],
+  "gradle.autoDetect": "off",
+  "gradle.allowParallelRun": false,
+
+  // Menos archivos vigilados = menos memoria en VS Code
+  "files.watcherExclude": {
+    "**/build/**": true,
+    "**/.dart_tool/**": true,
+    "**/android/.gradle/**": true,
+    "**/android/.kotlin/**": true
+  },
+  "search.exclude": {
+    "**/build": true,
+    "**/.dart_tool": true
+  }
+}
