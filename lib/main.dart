@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'controllers/auth_controller.dart';
+import 'screens/root_shell.dart';
 import 'services/api_client.dart';
 import 'theme/app_theme.dart';
 import 'utils/reporte_errores.dart';
-import 'widgets/empty_view.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   ReporteErrores.instalar();
   await Hive.initFlutter();
+  // Un solo cliente HTTP y un solo controlador de sesión para toda la app.
+  // Al crearse, AuthController comprueba si hay un token guardado.
   Get.put(ApiClient(), permanent: true);
+  Get.put(AuthController(), permanent: true);
   runApp(const InventarioApp());
 }
 
@@ -29,12 +33,7 @@ class InventarioApp extends StatelessWidget {
       theme: AppTheme.claro,
       darkTheme: AppTheme.oscuro,
       themeMode: ThemeMode.system,
-      home:
-          home ??
-          Scaffold(
-            appBar: AppBar(title: const Text('Control de Inventario')),
-            body: const EmptyView(mensaje: 'Base de la app lista. Pronto: inicio de sesión.'),
-          ),
+      home: home ?? const PuertaSesion(),
     );
   }
 }

@@ -8,11 +8,6 @@ import 'package:flutter_test/flutter_test.dart';
 Widget _envolver(Widget hijo) => InventarioApp(home: Scaffold(body: hijo));
 
 void main() {
-  testWidgets('la app arranca con su título', (tester) async {
-    await tester.pumpWidget(const InventarioApp());
-    expect(find.text('Control de Inventario'), findsOneWidget);
-  });
-
   testWidgets('LoadingView muestra indicador y mensaje', (tester) async {
     await tester.pumpWidget(_envolver(const LoadingView(mensaje: 'Cargando productos...')));
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
