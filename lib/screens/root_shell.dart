@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/auth_controller.dart';
-import '../widgets/empty_view.dart';
 import '../widgets/loading_view.dart';
+import 'asistente_screen.dart';
 import 'favoritos_screen.dart';
 import 'login_screen.dart';
 import 'producto_form_screen.dart';
@@ -48,10 +48,7 @@ class _RootShellState extends State<RootShell> {
       body: switch (_indice) {
         0 => const ProductosScreen(),
         1 => const FavoritosScreen(),
-        _ => const EmptyView(
-          mensaje: 'Aquí podrás consultar al asistente.',
-          icono: Icons.auto_awesome,
-        ),
+        _ => const AsistenteScreen(),
       },
       floatingActionButton: _indice == 0
           ? FloatingActionButton.extended(

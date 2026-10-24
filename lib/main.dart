@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'controllers/asistente_controller.dart';
 import 'controllers/auth_controller.dart';
 import 'controllers/favoritos_controller.dart';
 import 'controllers/productos_controller.dart';
@@ -24,6 +25,7 @@ Future<void> main() async {
   Get.put(AuthController(), permanent: true);
   Get.put(ProductosController(), permanent: true);
   Get.put(FavoritosController(), permanent: true);
+  Get.put(AsistenteController(), permanent: true);
   runApp(const InventarioApp());
 }
 
