@@ -37,10 +37,16 @@ class RepositorioFalso implements ProductosRepository {
   }
 
   @override
-  Future<List<Producto>> obtenerTodos() async {
+  Future<ResultadoProductos> obtenerTodos(int usuarioId) async {
     _fallarSiCorresponde();
-    return List.of(productos);
+    return ResultadoProductos(List.of(productos));
   }
+
+  @override
+  Future<void> actualizarCache(int usuarioId, List<Producto> productos) async {}
+
+  @override
+  Future<void> borrarCache(int usuarioId) async {}
 
   @override
   Future<Producto> crear({

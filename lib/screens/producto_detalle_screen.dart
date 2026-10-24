@@ -6,6 +6,7 @@ import '../controllers/productos_controller.dart';
 import '../models/producto.dart';
 import '../theme/app_theme.dart';
 import '../utils/validadores.dart';
+import '../widgets/boton_favorito.dart';
 import '../widgets/empty_view.dart';
 import 'producto_form_screen.dart';
 
@@ -37,6 +38,7 @@ class ProductoDetalleScreen extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Producto'),
           actions: [
+            BotonFavorito(productoId: producto.id, colorInactivo: Colors.white),
             IconButton(
               tooltip: 'Editar',
               icon: const Icon(Icons.edit_outlined),

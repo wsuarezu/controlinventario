@@ -1,4 +1,5 @@
 import 'package:controlinventario/controllers/auth_controller.dart';
+import 'package:controlinventario/controllers/favoritos_controller.dart';
 import 'package:controlinventario/controllers/productos_controller.dart';
 import 'package:controlinventario/main.dart';
 import 'package:controlinventario/repositories/productos_repository.dart';
@@ -85,6 +86,26 @@ void main() {
       expect(auth.estaAutenticado, isTrue);
     });
 
+    test('sin conexión al abrir, entra con el usuario guardado (para ver la caché)', () async {
+      api = clienteFalso({}); // sin la ruta: se simula abajo con un error de conexión
+      api.dio.httpClientAdapter = _SinRed();
+      almacen
+        ..token = 'tok'
+        ..usuarioJson = '{"id":1,"email":"ana@tienda.com"}';
+      final auth = crear();
+      await auth.restaurarSesion();
+
+      expect(auth.usuario.value?.email, 'ana@tienda.com');
+      expect(almacen.token, 'tok', reason: 'sin red no se sabe si caducó: se conserva');
+      expect(auth.avisoSesion.value, contains('No hay conexión'));
+    });
+
+    test('al iniciar sesión guarda id y correo junto al token', () async {
+      final auth = crear();
+      await auth.iniciarSesion('ana@tienda.com', 'clave123');
+      expect(almacen.usuarioJson, contains('ana@tienda.com'));
+    });
+
     test('un token guardado inválido se borra y avisa que caducó', () async {
       almacen.token = 'viejo';
       final auth = crear();
@@ -140,6 +161,7 @@ void main() {
       Get.put(
         ProductosController(repositorio: ProductosRepository(ProductosApiService(api)), auth: auth),
       );
+      Get.put(FavoritosController(servicio: FavoritosFalso(), auth: auth));
       await tester.pumpWidget(const InventarioApp());
       await tester.pumpAndSettle();
 
@@ -161,4 +183,17 @@ void main() {
       expect(almacen.token, isNull);
     });
   });
+}
+
+/// Adaptador que falla como un backend apagado.
+class _SinRed implements HttpClientAdapter {
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<List<int>>? cuerpo,
+    Future<void>? cancelacion,
+  ) => throw DioException.connectionError(requestOptions: options, reason: 'Connection refused');
+
+  @override
+  void close({bool force = false}) {}
 }

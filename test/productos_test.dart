@@ -1,4 +1,5 @@
 import 'package:controlinventario/controllers/auth_controller.dart';
+import 'package:controlinventario/controllers/favoritos_controller.dart';
 import 'package:controlinventario/controllers/productos_controller.dart';
 import 'package:controlinventario/main.dart';
 import 'package:controlinventario/models/producto.dart';
@@ -62,6 +63,7 @@ void main() {
       await c.cargar();
 
       expect(c.productos.map((p) => p.nombre), ['Brocha', 'Clavos', 'Tornillos']);
+      expect(c.guardadoEl.value, isNull);
       expect(limit, '100');
       expect(c.totalPorReponer, 2);
     });
@@ -102,6 +104,7 @@ void main() {
       final auth = Get.put(AuthController(api: ApiClient(), almacen: AlmacenFalso()));
       auth.usuario.value = const Usuario(id: 1, email: 'ana@tienda.com');
       Get.put(ProductosController(repositorio: repo, auth: auth));
+      Get.put(FavoritosController(servicio: FavoritosFalso(), auth: auth));
       await tester.pumpWidget(const InventarioApp(home: Scaffold(body: ProductosScreen())));
       await tester.pumpAndSettle();
     }

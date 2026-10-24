@@ -1,4 +1,5 @@
 import 'package:controlinventario/controllers/auth_controller.dart';
+import 'package:controlinventario/controllers/favoritos_controller.dart';
 import 'package:controlinventario/controllers/productos_controller.dart';
 import 'package:controlinventario/main.dart';
 import 'package:controlinventario/models/producto.dart';
@@ -26,6 +27,7 @@ void main() {
     final auth = Get.put(AuthController(api: ApiClient(), almacen: AlmacenFalso()));
     auth.usuario.value = const Usuario(id: 1, email: 'ana@tienda.com');
     c = Get.put(ProductosController(repositorio: repo, auth: auth));
+    Get.put(FavoritosController(servicio: FavoritosFalso(), auth: auth));
   });
 
   tearDown(Get.reset);

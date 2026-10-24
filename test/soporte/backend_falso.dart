@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:controlinventario/services/api_client.dart';
+import 'package:controlinventario/services/favoritos_service.dart';
 import 'package:controlinventario/services/secure_token_storage.dart';
 import 'package:dio/dio.dart';
 
@@ -53,6 +54,7 @@ class AlmacenFalso implements SecureTokenStorage {
   AlmacenFalso([this.token]);
 
   String? token;
+  String? usuarioJson;
 
   @override
   Future<String?> leer() async => token;
@@ -61,5 +63,25 @@ class AlmacenFalso implements SecureTokenStorage {
   Future<void> guardar(String valor) async => token = valor;
 
   @override
-  Future<void> borrar() async => token = null;
+  Future<String?> leerUsuario() async => usuarioJson;
+
+  @override
+  Future<void> guardarUsuario(String json) async => usuarioJson = json;
+
+  @override
+  Future<void> borrar() async {
+    token = null;
+    usuarioJson = null;
+  }
+}
+
+/// Favoritos en memoria (sin Hive) para pruebas de widgets.
+class FavoritosFalso implements FavoritosService {
+  final Map<int, Set<int>> porUsuario = {};
+
+  @override
+  Set<int> leer(int usuarioId) => {...?porUsuario[usuarioId]};
+
+  @override
+  Future<void> guardar(int usuarioId, Set<int> ids) async => porUsuario[usuarioId] = {...ids};
 }

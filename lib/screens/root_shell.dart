@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../controllers/auth_controller.dart';
 import '../widgets/empty_view.dart';
 import '../widgets/loading_view.dart';
+import 'favoritos_screen.dart';
 import 'login_screen.dart';
 import 'producto_form_screen.dart';
 import 'productos_screen.dart';
@@ -46,10 +47,7 @@ class _RootShellState extends State<RootShell> {
       appBar: AppBar(title: Text(_titulos[_indice]), actions: const [MenuCuenta()]),
       body: switch (_indice) {
         0 => const ProductosScreen(),
-        1 => const EmptyView(
-          mensaje: 'Aquí verás tus productos favoritos.',
-          icono: Icons.star_border,
-        ),
+        1 => const FavoritosScreen(),
         _ => const EmptyView(
           mensaje: 'Aquí podrás consultar al asistente.',
           icono: Icons.auto_awesome,
@@ -108,7 +106,9 @@ class MenuCuenta extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Cerrar sesión'),
-        content: const Text('Se borrarán los datos guardados en este teléfono para tu cuenta.'),
+        content: const Text(
+          'Se borrará la copia offline del inventario guardada en este teléfono.',
+        ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
           FilledButton(
