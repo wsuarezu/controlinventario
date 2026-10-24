@@ -17,4 +17,16 @@ class Validadores {
 
   static String? requerido(String? valor, {String campo = 'este campo'}) =>
       (valor == null || valor.trim().isEmpty) ? 'Completa $campo' : null;
+
+  static String? enteroNoNegativo(String? valor) {
+    final numero = int.tryParse(valor?.trim() ?? '');
+    if (numero == null) return 'Escribe un número entero';
+    return numero < 0 ? 'No puede ser negativo' : null;
+  }
+
+  static String? enteroPositivo(String? valor) {
+    final numero = int.tryParse(valor?.trim() ?? '');
+    if (numero == null) return 'Escribe un número entero';
+    return numero <= 0 ? 'Debe ser mayor que cero' : null;
+  }
 }

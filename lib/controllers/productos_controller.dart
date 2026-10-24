@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:get/get.dart';
 
 import '../models/producto.dart';
@@ -25,6 +27,9 @@ class ProductosController extends GetxController {
 
   /// Mensaje del último error de carga; vacío si no hubo error.
   final RxString error = ''.obs;
+
+  /// true mientras se guarda un cambio (crear, editar, ajustar o eliminar).
+  final RxBool guardando = false.obs;
 
   final Rx<FiltroProductos> filtro = FiltroProductos.todos.obs;
   final RxString busqueda = ''.obs;
@@ -63,6 +68,63 @@ class ProductosController extends GetxController {
       cargando.value = false;
     }
   }
+
+  Producto? porId(int id) => productos.firstWhereOrNull((p) => p.id == id);
+
+  // Cada operación devuelve null si salió bien, o el mensaje para mostrar.
+
+  Future<String?> crear({
+    required String nombre,
+    required int cantidad,
+    required int cantidadMinima,
+  }) => _guardar(() async {
+    final nuevo = await _repo.crear(
+      nombre: nombre,
+      cantidad: cantidad,
+      cantidadMinima: cantidadMinima,
+    );
+    productos.add(nuevo);
+    _ordenar();
+  });
+
+  Future<String?> actualizar(int id, {String? nombre, int? cantidadMinima}) => _guardar(() async {
+    _reemplazar(await _repo.actualizar(id, nombre: nombre, cantidadMinima: cantidadMinima));
+    _ordenar();
+  });
+
+  /// `delta` positivo = entrada de mercadería; negativo = salida.
+  Future<String?> ajustar(int id, int delta) =>
+      _guardar(() async => _reemplazar(await _repo.ajustar(id, delta)));
+
+  Future<String?> eliminar(int id) => _guardar(() async {
+    await _repo.eliminar(id);
+    productos.removeWhere((p) => p.id == id);
+  });
+
+  /// Solo práctica (menú de pruebas): devuelve el mensaje del 422.
+  Future<String?> enviarDatosInvalidos() => _guardar(_repo.enviarDatosInvalidos);
+
+  Future<String?> _guardar(Future<void> Function() operacion) async {
+    guardando.value = true;
+    try {
+      await operacion();
+      return null;
+    } on ApiException catch (e) {
+      // 404: otro dispositivo lo borró; se recarga para no mostrar datos viejos.
+      if (e.statusCode == 404) unawaited(cargar());
+      return e.mensaje;
+    } finally {
+      guardando.value = false;
+    }
+  }
+
+  void _reemplazar(Producto actualizado) {
+    final i = productos.indexWhere((p) => p.id == actualizado.id);
+    if (i >= 0) productos[i] = actualizado;
+  }
+
+  void _ordenar() =>
+      productos.sort((a, b) => a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()));
 
   Future<void> limpiar() async {
     productos.clear();
