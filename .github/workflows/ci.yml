@@ -50,3 +50,6 @@ jobs:
 
       - name: Ejecutar las pruebas
         run: flutter test
+
+      - name: Probar el servidor del asistente (Node)
+        run: node --test asistente-server/asistente-server.test.js
