@@ -13,6 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 
 import 'soporte/backend_falso.dart';
+import 'soporte/repositorio_falso.dart';
 
 final _productos = [
   {'id': 1, 'nombre': 'Tornillos', 'cantidad': 40, 'cantidad_minima': 10},
@@ -94,7 +95,7 @@ void main() {
   });
 
   group('ProductosScreen', () {
-    late _RepositorioFalso repo;
+    late RepositorioFalso repo;
 
     /// Sin HTTP: dio no avanza dentro del reloj simulado de las pruebas de widgets.
     Future<void> montar(WidgetTester tester) async {
@@ -105,7 +106,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    setUp(() => repo = _RepositorioFalso(_productos.map(Producto.fromJson).toList()));
+    setUp(() => repo = RepositorioFalso(_productos.map(Producto.fromJson).toList()));
 
     testWidgets('muestra la lista con la alerta de reposición', (tester) async {
       await montar(tester);
@@ -134,17 +135,4 @@ void main() {
       expect(find.text('Tornillos'), findsOneWidget);
     });
   });
-}
-
-class _RepositorioFalso implements ProductosRepository {
-  _RepositorioFalso(this.productos);
-
-  List<Producto> productos;
-  ApiException? error;
-
-  @override
-  Future<List<Producto>> obtenerTodos() async {
-    if (error != null) throw error!;
-    return List.of(productos);
-  }
 }

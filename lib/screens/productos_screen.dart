@@ -7,6 +7,8 @@ import '../widgets/empty_view.dart';
 import '../widgets/error_view.dart';
 import '../widgets/loading_view.dart';
 import '../widgets/producto_tile.dart';
+import 'producto_detalle_screen.dart';
+import 'producto_form_screen.dart';
 
 /// Lista del inventario con búsqueda, filtro «Por reponer» y pull-to-refresh.
 /// Cubre los estados de carga, error y vacío (sin productos o sin resultados).
@@ -27,9 +29,13 @@ class ProductosScreen extends StatelessWidget {
         return RefreshIndicator(
           onRefresh: c.cargar,
           child: ListView(
-            children: const [
-              SizedBox(height: 120),
-              EmptyView(mensaje: 'Aún no tienes productos en tu inventario.'),
+            children: [
+              const SizedBox(height: 120),
+              EmptyView(
+                mensaje: 'Aún no tienes productos en tu inventario.',
+                textoAccion: 'Agregar producto',
+                onAccion: () => Get.to(() => const ProductoFormScreen()),
+              ),
             ],
           ),
         );
@@ -115,7 +121,10 @@ class _Lista extends StatelessWidget {
             : ListView.builder(
                 padding: const EdgeInsets.only(top: AppSpacing.sm, bottom: 88),
                 itemCount: visibles.length,
-                itemBuilder: (_, i) => ProductoTile(producto: visibles[i]),
+                itemBuilder: (_, i) => ProductoTile(
+                  producto: visibles[i],
+                  onTap: () => Get.to(() => ProductoDetalleScreen(productoId: visibles[i].id)),
+                ),
               ),
       );
     });

@@ -5,6 +5,7 @@ import '../controllers/auth_controller.dart';
 import '../widgets/empty_view.dart';
 import '../widgets/loading_view.dart';
 import 'login_screen.dart';
+import 'producto_form_screen.dart';
 import 'productos_screen.dart';
 
 /// Raíz de la app: mientras se comprueba el token muestra la carga; sin
@@ -54,6 +55,13 @@ class _RootShellState extends State<RootShell> {
           icono: Icons.auto_awesome,
         ),
       },
+      floatingActionButton: _indice == 0
+          ? FloatingActionButton.extended(
+              onPressed: () => Get.to(() => const ProductoFormScreen()),
+              icon: const Icon(Icons.add),
+              label: const Text('Producto'),
+            )
+          : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _indice,
         onDestinationSelected: (i) => setState(() => _indice = i),
