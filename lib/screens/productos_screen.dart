@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 
 import '../controllers/productos_controller.dart';
 import '../theme/app_theme.dart';
+import '../utils/formato.dart';
+import '../widgets/boton_favorito.dart';
 import '../widgets/empty_view.dart';
 import '../widgets/error_view.dart';
 import '../widgets/loading_view.dart';
@@ -43,7 +45,14 @@ class ProductosScreen extends StatelessWidget {
       return Column(
         children: [
           _Encabezado(c: c),
-          if (c.error.value.isNotEmpty) _AvisoError(mensaje: c.error.value),
+          if (c.guardadoEl.value != null)
+            _Aviso(
+              icono: Icons.cloud_off,
+              mensaje:
+                  'Sin conexión. Mostrando los datos guardados el ${fechaCorta(c.guardadoEl.value!)}. '
+                  'Desliza hacia abajo para reintentar.',
+            ),
+          if (c.error.value.isNotEmpty) _Aviso(icono: Icons.error_outline, mensaje: c.error.value),
           Expanded(child: _Lista(c: c)),
         ],
       );
@@ -123,6 +132,7 @@ class _Lista extends StatelessWidget {
                 itemCount: visibles.length,
                 itemBuilder: (_, i) => ProductoTile(
                   producto: visibles[i],
+                  trailing: BotonFavorito(productoId: visibles[i].id),
                   onTap: () => Get.to(() => ProductoDetalleScreen(productoId: visibles[i].id)),
                 ),
               ),
@@ -131,10 +141,12 @@ class _Lista extends StatelessWidget {
   }
 }
 
-/// Error al recargar cuando ya hay datos en pantalla: no se borran, se avisa.
-class _AvisoError extends StatelessWidget {
-  const _AvisoError({required this.mensaje});
+/// Aviso sobre la lista (datos offline o error al recargar): los datos ya
+/// mostrados no se borran, se avisa encima.
+class _Aviso extends StatelessWidget {
+  const _Aviso({required this.icono, required this.mensaje});
 
+  final IconData icono;
   final String mensaje;
 
   @override
@@ -148,7 +160,15 @@ class _AvisoError extends StatelessWidget {
         color: tema.colorScheme.errorContainer,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(mensaje, style: TextStyle(color: tema.colorScheme.onErrorContainer)),
+      child: Row(
+        children: [
+          Icon(icono, size: 18, color: tema.colorScheme.onErrorContainer),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(mensaje, style: TextStyle(color: tema.colorScheme.onErrorContainer)),
+          ),
+        ],
+      ),
     );
   }
 }

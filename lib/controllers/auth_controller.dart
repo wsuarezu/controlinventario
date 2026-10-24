@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 
 import '../models/usuario.dart';
@@ -79,26 +81,38 @@ class AuthController extends GetxController {
     final token = await _servicio.iniciarSesion(email, password);
     _api.token = token;
     await _almacen.guardar(token);
-    usuario.value = await _servicio.usuarioActual();
+    await _cargarUsuario();
     avisoSesion.value = '';
   }
 
+  /// GET /usuarios/me; guarda id y correo para poder abrir la app sin conexión.
+  Future<void> _cargarUsuario() async {
+    final actual = await _servicio.usuarioActual();
+    await _almacen.guardarUsuario(jsonEncode(actual.toJson()));
+    usuario.value = actual;
+  }
+
   /// Al abrir la app: si hay token guardado, comprueba con GET /usuarios/me
-  /// que siga siendo válido. Un 401 lo borra; sin conexión, se conserva
-  /// (puede seguir siendo válido) y se avisa.
+  /// que siga siendo válido. Un 401 lo borra. Sin conexión se conserva (puede
+  /// seguir siendo válido) y se entra con el usuario guardado, para mostrar
+  /// la caché offline.
   Future<void> restaurarSesion() async {
     restaurando.value = true;
     try {
       final guardado = await _almacen.leer();
       if (guardado == null) return;
       _api.token = guardado;
-      usuario.value = await _servicio.usuarioActual();
+      await _cargarUsuario();
     } on ApiException catch (e) {
       if (e.esNoAutorizado) {
         await cerrarSesion();
         avisoSesion.value = mensajeCaducada;
       } else {
         avisoSesion.value = e.mensaje;
+        final json = e.sinConexion ? await _almacen.leerUsuario() : null;
+        if (json != null) {
+          usuario.value = Usuario.fromJson(jsonDecode(json) as Map<String, dynamic>);
+        }
       }
     } finally {
       restaurando.value = false;

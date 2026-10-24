@@ -7,4 +7,6 @@ class Usuario {
 
   factory Usuario.fromJson(Map<String, dynamic> json) =>
       Usuario(id: (json['id'] as num).toInt(), email: json['email'] as String);
+
+  Map<String, dynamic> toJson() => {'id': id, 'email': email};
 }

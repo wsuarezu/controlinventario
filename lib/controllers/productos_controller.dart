@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../models/producto.dart';
 import '../repositories/productos_repository.dart';
 import '../services/api_client.dart';
+import '../services/cache_productos_service.dart';
 import '../services/productos_api_service.dart';
 import 'auth_controller.dart';
 
@@ -16,7 +17,9 @@ enum FiltroProductos { todos, porReponer }
 /// cerrarla.
 class ProductosController extends GetxController {
   ProductosController({ProductosRepository? repositorio, AuthController? auth})
-    : _repo = repositorio ?? ProductosRepository(ProductosApiService(Get.find<ApiClient>())),
+    : _repo =
+          repositorio ??
+          ProductosRepository(ProductosApiService(Get.find<ApiClient>()), CacheProductosService()),
       _auth = auth ?? Get.find<AuthController>();
 
   final ProductosRepository _repo;
@@ -27,6 +30,10 @@ class ProductosController extends GetxController {
 
   /// Mensaje del último error de carga; vacío si no hubo error.
   final RxString error = ''.obs;
+
+  /// Fecha de la copia offline que se está mostrando; null si los datos
+  /// vienen del backend.
+  final Rxn<DateTime> guardadoEl = Rxn<DateTime>();
 
   /// true mientras se guarda un cambio (crear, editar, ajustar o eliminar).
   final RxBool guardando = false.obs;
@@ -56,11 +63,17 @@ class ProductosController extends GetxController {
     if (_auth.estaAutenticado) cargar();
   }
 
+  int? get _usuarioId => _auth.usuario.value?.id;
+
   Future<void> cargar() async {
+    final usuarioId = _usuarioId;
+    if (usuarioId == null) return;
     cargando.value = true;
     error.value = '';
     try {
-      productos.assignAll(await _repo.obtenerTodos());
+      final resultado = await _repo.obtenerTodos(usuarioId);
+      productos.assignAll(resultado.productos);
+      guardadoEl.value = resultado.guardadoEl;
     } on ApiException catch (e) {
       // Un 401 ya lo maneja AuthController (vuelve al login).
       if (!e.esNoAutorizado) error.value = e.mensaje;
@@ -108,6 +121,9 @@ class ProductosController extends GetxController {
     guardando.value = true;
     try {
       await operacion();
+      guardadoEl.value = null; // el backend respondió: ya no son datos offline
+      final usuarioId = _usuarioId;
+      if (usuarioId != null) await _repo.actualizarCache(usuarioId, productos);
       return null;
     } on ApiException catch (e) {
       // 404: otro dispositivo lo borró; se recarga para no mostrar datos viejos.
@@ -126,7 +142,11 @@ class ProductosController extends GetxController {
   void _ordenar() =>
       productos.sort((a, b) => a.nombre.toLowerCase().compareTo(b.nombre.toLowerCase()));
 
+  /// Al cerrar sesión: borra la copia offline de este usuario y vacía la lista.
   Future<void> limpiar() async {
+    final usuarioId = _usuarioId;
+    if (usuarioId != null) await _repo.borrarCache(usuarioId);
+    guardadoEl.value = null;
     productos.clear();
     error.value = '';
     busqueda.value = '';
