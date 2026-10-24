@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'controllers/auth_controller.dart';
+import 'controllers/productos_controller.dart';
 import 'screens/root_shell.dart';
 import 'services/api_client.dart';
 import 'theme/app_theme.dart';
@@ -16,6 +17,7 @@ Future<void> main() async {
   // Al crearse, AuthController comprueba si hay un token guardado.
   Get.put(ApiClient(), permanent: true);
   Get.put(AuthController(), permanent: true);
+  Get.put(ProductosController(), permanent: true);
   runApp(const InventarioApp());
 }
 

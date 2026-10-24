@@ -5,6 +5,7 @@ import '../controllers/auth_controller.dart';
 import '../widgets/empty_view.dart';
 import '../widgets/loading_view.dart';
 import 'login_screen.dart';
+import 'productos_screen.dart';
 
 /// Raíz de la app: mientras se comprueba el token muestra la carga; sin
 /// sesión, el login; con sesión, la app. Al cerrar sesión o caducar el token,
@@ -43,7 +44,7 @@ class _RootShellState extends State<RootShell> {
     return Scaffold(
       appBar: AppBar(title: Text(_titulos[_indice]), actions: const [MenuCuenta()]),
       body: switch (_indice) {
-        0 => const EmptyView(mensaje: 'Aquí verás tus productos.'),
+        0 => const ProductosScreen(),
         1 => const EmptyView(
           mensaje: 'Aquí verás tus productos favoritos.',
           icono: Icons.star_border,

@@ -1,5 +1,8 @@
 import 'package:controlinventario/controllers/auth_controller.dart';
+import 'package:controlinventario/controllers/productos_controller.dart';
 import 'package:controlinventario/main.dart';
+import 'package:controlinventario/repositories/productos_repository.dart';
+import 'package:controlinventario/services/productos_api_service.dart';
 import 'package:controlinventario/screens/root_shell.dart';
 import 'package:controlinventario/services/api_client.dart';
 import 'package:dio/dio.dart';
@@ -22,6 +25,7 @@ Map<String, RespuestaFalsa Function(RequestOptions)> _rutas() => {
   'GET /usuarios/me': (o) => o.headers['Authorization'] == 'Bearer tok'
       ? (codigo: 200, cuerpo: _usuario)
       : (codigo: 401, cuerpo: {'detail': 'Credenciales inválidas'}),
+  'GET /productos/': (o) => (codigo: 200, cuerpo: <Object>[]),
   'POST /usuarios/': (o) => (o.data as Map)['email'] == 'ana@tienda.com'
       ? (codigo: 400, cuerpo: {'detail': 'El email ya está registrado'})
       : (codigo: 201, cuerpo: {'id': 2, 'email': (o.data as Map)['email']}),
@@ -132,7 +136,10 @@ void main() {
     });
 
     testWidgets('entrar lleva al inventario y cerrar sesión vuelve al login', (tester) async {
-      Get.put(crear());
+      final auth = Get.put(crear());
+      Get.put(
+        ProductosController(repositorio: ProductosRepository(ProductosApiService(api)), auth: auth),
+      );
       await tester.pumpWidget(const InventarioApp());
       await tester.pumpAndSettle();
 
