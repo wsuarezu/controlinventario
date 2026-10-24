@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../controllers/auth_controller.dart';
+import '../widgets/menu_pruebas.dart';
 import '../widgets/loading_view.dart';
 import 'asistente_screen.dart';
 import 'favoritos_screen.dart';
@@ -44,7 +45,7 @@ class _RootShellState extends State<RootShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_titulos[_indice]), actions: const [MenuCuenta()]),
+      appBar: AppBar(title: Text(_titulos[_indice]), actions: const [MenuPruebas(), MenuCuenta()]),
       body: switch (_indice) {
         0 => const ProductosScreen(),
         1 => const FavoritosScreen(),
