@@ -9,7 +9,7 @@ Control de Inventario es una app Flutter (Android) para llevar el stock de produ
 - Estado con GetX; datos remotos con `dio` contra un backend FastAPI con JWT
   (repositorio aparte: <https://github.com/wsuarezu/proyecto-integrador-speckit>).
 - Token en `flutter_secure_storage`; caché offline y favoritos en Hive.
-- Asistente de IA a través de un servidor propio en `asistente-server/` (Node), que es el único que conoce la clave del proveedor de modelos.
+- Asistente de IA a través de un servidor propio en `asistente-server/` (Node), que es el único que conoce la clave del proveedor de modelos (variable de entorno `GEMINI_API_KEY`, nunca en un archivo del repositorio).
 
 ## Dónde está cada cosa
 
@@ -18,7 +18,7 @@ Control de Inventario es una app Flutter (Android) para llevar el stock de produ
 - `lib/services/` — acceso al backend (`ApiClient`), al asistente y a Hive / almacenamiento seguro.
 - `lib/screens/` y `lib/widgets/` — pantallas y piezas de interfaz.
 - `lib/models/`, `lib/config/`, `lib/theme/`, `lib/utils/` — modelos, configuración, tema y utilidades.
-- `asistente-server/` — proxy de IA (Node 18+, sin dependencias).
+- `asistente-server/` — servidor del asistente (Node 18+, sin dependencias); pruebas con `node --test asistente-server/asistente-server.test.js`.
 - `test/` — pruebas de widgets y de servicios.
 - `docs/` — enunciado del Proyecto Final y documentación técnica.
 
@@ -27,9 +27,10 @@ Control de Inventario es una app Flutter (Android) para llevar el stock de produ
 ```bash
 flutter analyze
 flutter test
+node --test asistente-server/asistente-server.test.js   # si cambiaste el asistente
 ```
 
-Los dos deben terminar sin errores. Si fallan, corrige el código; no desactives el análisis ni borres pruebas para que pasen.
+Todos deben terminar sin errores. Si fallan, corrige el código; no desactives el análisis ni borres pruebas para que pasen.
 
 ## Convenciones
 
